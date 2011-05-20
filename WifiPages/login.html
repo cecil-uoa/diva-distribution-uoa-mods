@@ -2,9 +2,9 @@
 <div id="subscribe">
   <form action="/wifi/login" method="post">
     <input name="METHOD" type="hidden" value="login" class="inputstyle" />
-    <input name="firstname" type="text" value="FIRST NAME" class="inputstyle" />
-    <input name="lastname" type="text" value="LAST NAME" class="inputstyle" />
-    <input name="password" type="password" value="YOUR PASSWORD" class="inputstyle" />
+    <input name="firstname" type="text" value="FIRST NAME" class="inputstyle" onfocus="inputOnFocus(this, 'FIRST NAME');"  onblur="inputOnBlur(this, 'FIRST NAME');" />
+    <input name="lastname" type="text" value="LAST NAME" class="inputstyle" onfocus="inputOnFocus(this, 'LAST NAME');" onblur="inputOnBlur(this, 'LAST NAME');" />
+    <input name="password" type="password" value="YOUR PASSWORD" class="inputstyle" onfocus="inputOnFocus(this, 'YOUR PASSWORD');" onblur="inputOnBlur(this, 'YOUR PASSWORD');" />
     <input type="submit" value="login" class="button" />
   </form>
 

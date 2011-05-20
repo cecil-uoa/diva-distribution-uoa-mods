@@ -13,3 +13,17 @@ function OnUnload() {
 }
 window.onload = OnLoad;
 window.onunload = OnUnload;
+
+function inputOnFocus(object, val) {
+    if (object.value.replace(/^\s+|\s+$/g, "") == val) {
+        object.value = "";
+    }
+}
+
+function inputOnBlur(object, val)
+{
+    if (object.value.replace(/^\s+|\s+$/g, "") == "")
+    {
+        object.value = val;
+    }
+}

@@ -1,20 +1,51 @@
-<p >Create new account</p>
-  <form action="/wifi/user/account" method="post">
-  <p class="bodytext"> 
-    First Name: (*)<br/>
-    <input name="first" type="text" class="inputstyle" /><br/><br/>
-    Last Name: (*)<br/>
-    <input name="last" type="text" class="inputstyle" /><br/><br/>
-    Email:<br/>
-    <input name="email" type="text" class="inputstyle" /><br/><br/>
-    Password: (*)<br/>
-    <input name="password" type="password" class="inputstyle" /><br/><br/>
-    Retype password: (*)<br/>
-    <input name="password2" type="password" class="inputstyle" /><br/><br/>
-    Type of avatar:<br />
-    <!-- #include file=avatarselectitem.html -->
+<form action="/wifi/user/account" method="post">
+	<table>
+		<tr>
+			<td id="account_create_fields">
+				<!-- #get var=PostError -->
+				<h2 >Create new account</h2>
+				<p>All fields are required</p>
+				<p class="bodytext"> 
+					Avatar First Name:<br/>
+					<input name="first" type="text" class="inputstyle" value="<!-- #get var=PostFirst -->" /><br/><br/>
+					Avatar Last Name:<br/>
+					<input name="last" type="text" class="inputstyle" value="<!-- #get var=PostLast -->" /><br/><br/>
+					Email:<br/>
+					<input name="email" type="text" class="inputstyle" value="<!-- #get var=PostEmail -->" /><br/><br/>
+					Password:<br/>
+					<input name="password" type="password" class="inputstyle" /><br/><br/>
+					Retype password:<br/>
+					<input name="password2" type="password" class="inputstyle" /><br/><br/>
 
-    <input type="submit" value="create" class="button" />
-  </p> 
-  </form>
+					
+					Real First Name:<br/>
+					<input name="realFirst" type="text" class="inputstyle" value="<!-- #get var=PostRealFirst -->" /><br/><br/>
+					Real Last Name:<br/>
+					<input name="realLast" type="text" class="inputstyle" value="<!-- #get var=PostRealLast -->" /><br/><br/>
+					Institution:<br/>
+					<input name="institution" type="text" class="inputstyle" value="<!-- #get var=PostInstitution -->" /><br/><br/>
 
+					<div style="text-align:center;">
+					<input type="submit" value="create" class="button" />
+					</div>
+				</p> 
+			</td>
+			<td id="avatar_selection">
+				<label for="male_avatar">
+					<div class="avatar_option">
+						<div id="male_avatar_img" class="avatar_img"></div>
+						<input id="male_avatar" class="avatar" name="avatar" type="radio" value="Male" checked="checked">
+						Male
+					</div>
+				</label>
+				<label for="female_avatar">
+				<div class="avatar_option">
+					<div id="female_avatar_img" class="avatar_img"></div>
+					<input id="female_avatar" class="avatar" name="avatar" type="radio" value="Female">
+					Female
+				</div>
+				</label>
+			</td>
+		</tr>
+	</table>
+</form>
