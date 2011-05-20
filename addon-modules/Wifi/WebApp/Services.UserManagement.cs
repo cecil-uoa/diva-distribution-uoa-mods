@@ -32,6 +32,7 @@ using log4net;
 using OpenMetaverse;
 
 using OpenSim.Services.Interfaces;
+using Diva.Data;
 
 namespace Diva.Wifi
 {
@@ -72,7 +73,8 @@ namespace Diva.Wifi
                     env.State = State.UserSearchFormResponse;
                     // Put the list in the environment
                     List<UserAccount> accounts = m_UserAccountService.GetActiveAccounts(UUID.Zero, terms, m_PendingIdentifier);
-                    env.Data = Objectify<UserAccount>(accounts);
+                    List<UserAccountWithMappingData> accountsWithMapping = GetMappingOfUsers(accounts);
+                    env.Data = Objectify<UserAccountWithMappingData>(accountsWithMapping);
 
                     return PadURLs(env, sinfo.Sid, m_WebApp.ReadFile(env, "index.html"));
                 }

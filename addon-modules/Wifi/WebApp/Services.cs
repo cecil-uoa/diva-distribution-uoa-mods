@@ -53,6 +53,7 @@ using Environment = Diva.Wifi.Environment;
 using GridRegion = OpenSim.Services.Interfaces.GridRegion;
 
 using Diva.OpenSimServices;
+using Diva.Data;
 
 namespace Diva.Wifi
 {
@@ -296,15 +297,37 @@ namespace Diva.Wifi
         private List<object> GetUserList(Environment env, string terms)
         {
             List<UserAccount> accounts = m_UserAccountService.GetUserAccounts(UUID.Zero, terms);
-            if (accounts != null && accounts.Count > 0)
+            
+            List<UserAccountWithMappingData> accountsWithMapping = new List<UserAccountWithMappingData>();
+            foreach (UserAccount account in accounts)
             {
-                return Objectify<UserAccount>(accounts);
+                accountsWithMapping.Add(new UserAccountWithMappingData(account, 
+                    m_UserAccountService.getUserMapping(account.PrincipalID)));
+            }
+
+            if (accountsWithMapping != null && accountsWithMapping.Count > 0)
+
+            {
+                return Objectify<UserAccountWithMappingData>(accountsWithMapping);
+
             }
             else
             {
                 return new List<object>();
             }
 
+        }
+
+        private List<UserAccountWithMappingData> GetMappingOfUsers(List<UserAccount> accounts)
+        {
+            List<UserAccountWithMappingData> accountsWithMapping = new List<UserAccountWithMappingData>();
+            foreach (UserAccount account in accounts)
+            {
+                accountsWithMapping.Add(new UserAccountWithMappingData(account,
+                    m_UserAccountService.getUserMapping(account.PrincipalID)));
+            }
+
+            return accountsWithMapping;
         }
 
         private List<object> GetDefaultAvatarSelectionList()

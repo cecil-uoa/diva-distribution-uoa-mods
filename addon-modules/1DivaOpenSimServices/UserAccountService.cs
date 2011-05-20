@@ -34,6 +34,7 @@ using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Data;
 using OpenSim.Services.Interfaces;
+using Diva.Data;
 
 namespace Diva.OpenSimServices
 {
@@ -41,20 +42,24 @@ namespace Diva.OpenSimServices
     {
         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly string m_CastWarning = "[DivaData]: Invalid cast for UserAccount store. Diva.Data required for method {0}.";
+        protected IUserMappingData m_Database2 = null;
 
         public UserAccountService(IConfigSource config)
             : base(config)
         {
+            setupMappingDBConnection(config);
         }
 
         public bool DeleteAccount(UUID scopeID, UUID userID)
         {
+            m_Database2.Delete("PrincipalID", userID.ToString());   // Delete the mapping along with the account
             return m_Database.Delete("PrincipalID", userID.ToString());
         }
 
         public List<UserAccount> GetActiveAccounts(UUID scopeID, string term, string excludeTerm)
         {
             List<UserAccount> activeAccounts = new List<UserAccount>();
+            List<UserAccountWithMappingData> accountsWithMapping = new List<UserAccountWithMappingData>();
             try
             {
                 UserAccountData[] accounts = ((Diva.Data.IUserAccountData)m_Database).GetActiveAccounts(scopeID, term, excludeTerm);
@@ -90,7 +95,64 @@ namespace Diva.OpenSimServices
             account.ScopeID = d.ScopeID;
             account.FirstName = d.FirstName;
             account.LastName = d.LastName;
+
             return account;
+        }
+
+        public UserMappingData getUserMapping(string ConnectID)
+        {
+            UserMappingData[] d = m_Database2.Get(new string[] { "ConnectID" }, new string[] { ConnectID });
+            if (d.Length < 1)
+            {
+                return null;
+            }
+
+            return d[0];
+        }
+
+        public UserMappingData getUserMapping(UUID PrincipalID)
+        {
+            UserMappingData[] d = m_Database2.Get(new string[] { "PrincipalID" }, new string[] { PrincipalID.ToString() });
+            if (d.Length < 1)
+            {
+                return null;
+            }
+
+            return d[0];
+        }
+
+        public bool StoreUserMapping(UserMappingData data)
+        {
+            // Store the account mapping
+            return m_Database2.Store(data);
+        }
+
+        private void setupMappingDBConnection(IConfigSource config)
+        {
+            string dllName = String.Empty;
+            string connString = String.Empty;
+            string realm = "useraccounts_connect_map";
+
+            // Get connection string from orignal
+            IConfig dbConfig = config.Configs["DatabaseService"];
+            if (dbConfig != null)
+            {
+                connString = dbConfig.GetString("ConnectionString", String.Empty);
+            }
+
+            // Get dll plugin from WifiService section
+            dbConfig = config.Configs["WifiService"];
+            if (dbConfig != null)
+            {
+                dllName = dbConfig.GetString("StorageProvider", String.Empty);
+            }
+
+            if (dllName == String.Empty)
+                throw new Exception("No StorageProvider configured");
+
+            m_Database2 = LoadPlugin<IUserMappingData>(dllName, new Object[] { connString, realm });
+            if (m_Database2 == null)
+                throw new Exception("Could not find a storage interface in the given module");
         }
     }
 }

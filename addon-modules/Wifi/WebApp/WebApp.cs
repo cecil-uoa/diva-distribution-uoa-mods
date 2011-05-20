@@ -241,6 +241,14 @@ namespace Diva.Wifi
             get { return m_DefaultHome; }
         }
 
+        public string PostError = string.Empty;
+        public string PostFirst = string.Empty;
+        public string PostLast = string.Empty;
+        public string PostEmail = string.Empty;
+        public string PostRealFirst = string.Empty;
+        public string PostRealLast = string.Empty;
+        public string PostInstitution = string.Empty;
+
         private int m_HyperlinksUserLevel;
         public int HyperlinksUserLevel
         {

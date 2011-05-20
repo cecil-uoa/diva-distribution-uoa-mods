@@ -144,6 +144,10 @@ namespace Diva.Wifi
             string password2 = String.Empty;
             string avatar = string.Empty;
 
+            string institution = string.Empty;
+            string realFirst = string.Empty;
+            string realLast = string.Empty;
+
             if (request.ContainsKey("first") && WifiUtils.IsValidName(request["first"].ToString()))
                 first = request["first"].ToString();
             if (request.ContainsKey("last") && WifiUtils.IsValidName(request["last"].ToString()))
@@ -159,10 +163,38 @@ namespace Diva.Wifi
                 avatar = request["avatar"].ToString();
             }
 
+            if (request.ContainsKey("first") && !WifiUtils.IsValidName(request["first"].ToString()))
+            {
+                m_WebApp.PostFirst = request["first"].ToString();
+            }
+            if (request.ContainsKey("last") && !WifiUtils.IsValidName(request["last"].ToString()))
+            {
+                m_WebApp.PostLast = request["last"].ToString();
+            }
+            if (request.ContainsKey("email") && !WifiUtils.IsValidEmail(request["email"].ToString()))
+            {
+                m_WebApp.PostEmail = request["email"].ToString();
+            }
+
+
+            // Additional details
+            if (request.ContainsKey("institution"))
+            {
+                institution = request["institution"].ToString();
+            }
+            if (request.ContainsKey("realFirst"))
+            {
+                realFirst = request["realFirst"].ToString();
+            }
+            if (request.ContainsKey("realLast"))
+            {
+                realLast = request["realLast"].ToString();
+            }
+
             Request req = WifiUtils.CreateRequest(resource, httpRequest);
             Diva.Wifi.Environment env = new Diva.Wifi.Environment(req);
 
-            string result = m_WebApp.Services.NewAccountPostRequest(env, first, last, email, password, password2, avatar);
+            string result = m_WebApp.Services.NewAccountPostRequest(env, first, last, email, password, password2, avatar, institution, realFirst, realLast, "");
 
             return WifiUtils.StringToBytes(result);
         }

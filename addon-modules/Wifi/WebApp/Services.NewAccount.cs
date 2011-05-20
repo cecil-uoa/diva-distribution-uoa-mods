@@ -33,6 +33,7 @@ using OpenMetaverse;
 
 using OpenSim.Framework;
 using OpenSim.Services.Interfaces;
+using Diva.Data;
 
 namespace Diva.Wifi
 {
@@ -49,7 +50,8 @@ namespace Diva.Wifi
             return m_WebApp.ReadFile(env, "index.html");
         }
 
-        public string NewAccountPostRequest(Environment env, string first, string last, string email, string password, string password2, string avatarType)
+        public string NewAccountPostRequest(Environment env, string first, string last, string email, string password, string password2, string avatarType,
+                                                string institution = "", string realFirst = "", string realLast = "", string connectID = "")
         {
             if (!m_WebApp.IsInstalled)
             {
@@ -61,7 +63,16 @@ namespace Diva.Wifi
             m_log.DebugFormat("[Wifi]: NewAccountPostRequest");
             Request request = env.Request;
 
-            if ((password != string.Empty) && (password == password2) && (first != string.Empty) && (last != string.Empty))
+            // Validate data
+            first = first.Trim();
+            last = last.Trim();
+            institution = institution.Trim();
+            realFirst = realFirst.Trim();
+            realLast = realLast.Trim();
+            List<string> errorList = ValidateFormData(first, last, email, password, password2, institution, realFirst, realLast);
+
+            // Create account if there are no errors with the form input
+            if (errorList.Count == 0)
             {
                 UserAccount account = m_UserAccountService.GetUserAccount(UUID.Zero, first, last);
                 if (account == null)
@@ -88,6 +99,16 @@ namespace Diva.Wifi
 
                     m_UserAccountService.StoreUserAccount(account);
 
+                    // Create the account mapping
+                    UserMappingData accMapping = new UserMappingData();
+                    accMapping.ConnectID = connectID;
+                    accMapping.PrincipalID = account.PrincipalID;
+                    accMapping.RealFirstName = realFirst;
+                    accMapping.RealLastName = realLast;
+                    accMapping.Institution = institution;
+
+                    m_UserAccountService.StoreUserMapping(accMapping);
+
                     string notification = _("Your account has been created.", env);
                     if (!m_WebApp.AccountConfirmationRequired)
                     {
@@ -106,6 +127,11 @@ namespace Diva.Wifi
                             _("New account {0} {1} created in {2} is awaiting your approval.",
                             m_WebApp.AdminLanguage),
                             first, last, m_WebApp.GridName);
+                        
+                        message += string.Format("\n\nReal Name: {0} {1}", realFirst, realLast);
+                        message += string.Format("\nEmail: {0}", email);
+                        message += string.Format("\nInstitution: {0}", institution);
+                        
                         message += "\n\n" + m_WebApp.WebAddress + "/wifi";
                         SendEMail(
                             m_WebApp.AdminEmail,
@@ -126,13 +152,100 @@ namespace Diva.Wifi
             }
             else
             {
-                m_log.DebugFormat("[Wifi]: did not create account because of password and/or user name problems");
+                m_log.DebugFormat("[Wifi]: did not create account because of form field problems");
                 env.State = State.NewAccountForm;
                 env.Data = GetDefaultAvatarSelectionList();
+
+                if (errorList.Count > 0)
+                {
+                    m_WebApp.PostError = @"<div class=""error"">The following problems occurred:<ul>";
+                    foreach (string error in errorList)
+                    {
+                        m_WebApp.PostError += string.Format("<li>{0}</li>", error);
+                    }
+                    m_WebApp.PostError += "</ul></div>";
+                }
+                if (m_WebApp.PostFirst == string.Empty)
+                {
+                    m_WebApp.PostFirst = first;
+                }
+
+                if (m_WebApp.PostLast == string.Empty)
+                {
+                    m_WebApp.PostLast = last;
+                }
+
+                if (m_WebApp.PostEmail == string.Empty)
+                {
+                    m_WebApp.PostEmail = email;
+                }
+
+                m_WebApp.PostRealFirst = realFirst;
+                m_WebApp.PostRealLast = realLast;
+                m_WebApp.PostInstitution = institution;
             }
 
             return m_WebApp.ReadFile(env, "index.html");
 
+        }
+
+        private List<string> ValidateFormData(string first, string last, string email, string password, string password2, string institution, string realFirst, string realLast)
+        {
+            List<string> errorList = new List<string>();
+
+            if (first == string.Empty)
+            {
+                if (m_WebApp.PostFirst == string.Empty)
+                {
+                    errorList.Add("No Avatar First Name entered");
+                }
+                else
+                {
+                    errorList.Add("Invalid Avatar First Name entered");
+                }
+            }
+
+            if (last == string.Empty)
+            {
+                if (m_WebApp.PostLast == string.Empty)
+                {
+                    errorList.Add("No Avatar Last Name entered");
+                }
+                else
+                {
+                    errorList.Add("Invalid Avatar Last Name entered");
+                }
+            }
+
+            if (email == string.Empty)
+            {
+                errorList.Add("Invalid email entered");
+            }
+
+            if (password == string.Empty)
+            {
+                errorList.Add("No password entered");
+            }
+            else if (password != password2)
+            {
+                errorList.Add("Passwords do not match");
+            }
+
+            if (realFirst == string.Empty)
+            {
+                errorList.Add("No Real First Name entered");
+            }
+
+            if (realLast == string.Empty)
+            {
+                errorList.Add("No Real Last Name entered");
+            }
+
+            if (institution == string.Empty)
+            {
+                errorList.Add("No Institution entered");
+            }
+            return errorList;
         }
 
         private void SetAvatar(Environment env, UUID newUser, string avatarType)

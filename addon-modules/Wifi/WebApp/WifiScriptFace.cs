@@ -143,6 +143,85 @@ namespace Diva.Wifi
                 return (uint)value;
             }
         }
+
+        public string PostError
+        {
+            get
+            {
+                string ret = m_WebApp.PostError;
+                m_WebApp.PostError = string.Empty;
+                return ret;
+            }
+        }
+
+        public string PostFirst
+        {
+            get
+            {
+                string ret = m_WebApp.PostFirst;
+                m_WebApp.PostFirst = string.Empty;
+                return ret;
+            }
+        }
+
+        public string PostLast
+        {
+            get
+
+            {
+                string ret = m_WebApp.PostLast;
+                m_WebApp.PostLast = string.Empty;
+                return ret;
+            }
+        }
+
+        public string PostEmail
+        {
+            get
+            {
+                string ret = m_WebApp.PostEmail;
+                m_WebApp.PostEmail = string.Empty;
+                return ret;
+
+
+
+            }
+        }
+
+        public string PostRealFirst
+        {
+            get
+            {
+                string ret = m_WebApp.PostRealFirst;
+                m_WebApp.PostRealFirst = string.Empty;
+                return ret;
+
+
+
+            }
+        }
+
+        public string PostRealLast
+
+        {
+            get
+            {
+                string ret = m_WebApp.PostRealLast;
+                m_WebApp.PostRealLast = string.Empty;
+                return ret;
+            }
+
+        }
+
+        public string PostInstitution
+        {
+            get
+            {
+                string ret = m_WebApp.PostInstitution;
+                m_WebApp.PostInstitution = string.Empty;
+                return ret;
+            }
+        }
         
         #endregion
 
