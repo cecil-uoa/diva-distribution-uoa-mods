@@ -34,6 +34,7 @@ using OpenSim.Services.Interfaces;
 using Diva.Wifi;
 using Diva.OpenSimServices;
 using Diva.Wifi.WifiScript;
+using Diva.Data;
 
 namespace Diva.Wifi
 {
@@ -141,7 +142,7 @@ namespace Diva.Wifi
             return string.Empty;
         }
 
-        public static string GetAccountCreated(this UserAccount account, IEnvironment env)
+        public static string GetAccountCreated(this UserAccountWithMappingData account, IEnvironment env)
         {
             Environment env2 = (Environment)env;
             if (env2.Data == null || env2.Data.Count == 0)

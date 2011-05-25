@@ -275,7 +275,7 @@ namespace Diva.Wifi
 
             m_ExtensionMethods = typeof(ExtensionMethods);
             m_Statistics = new StatisticsDict();
-
+            
             WebAppInstance = this;
             WifiScriptFaceInstance = WifiScriptFace;
 
